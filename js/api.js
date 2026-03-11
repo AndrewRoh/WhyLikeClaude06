@@ -21,7 +21,7 @@
   // ─────────────────────────────────────────
 
   /** 사용할 Gemini 모델 이름 */
-  var MODEL = "gemini-2.5-flash-preview-04-17";
+  var MODEL = "gemini-2.0-flash";
 
   /** Gemini REST API 기본 주소 */
   var BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
@@ -87,7 +87,7 @@
       return "API 키가 올바르지 않습니다. 다시 확인해주세요.";
     }
 
-    // 404 : 모델을 찾을 수 없음
+    // 404 : 요청한 모델을 찾을 수 없음
     if (status === 404) {
       return "요청한 AI 모델을 찾을 수 없습니다. 관리자에게 문의해주세요.";
     }
