@@ -21,13 +21,13 @@
   // ─────────────────────────────────────────
 
   /** 사용할 Gemini 모델 이름 */
-  var MODEL = "gemini-2.0-flash";
+  var MODEL = "gemini-2.5-flash-preview-04-17";
 
-  /** Gemini REST API 엔드포인트 (API 키는 쿼리 파라미터로 붙입니다) */
-  var ENDPOINT =
-    "https://generativelanguage.googleapis.com/v1beta/models/" +
-    MODEL +
-    ":generateContent";
+  /** Gemini REST API 기본 주소 */
+  var BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
+
+  /** 콘텐츠 생성 엔드포인트 (API 키는 쿼리 파라미터로 붙입니다) */
+  var ENDPOINT = BASE_URL + "/models/" + MODEL + ":generateContent";
 
   /** 사용자가 입력한 API 키를 저장해 두는 변수 (외부에서 직접 접근 불가) */
   var apiKey = "";
@@ -87,6 +87,11 @@
       return "API 키가 올바르지 않습니다. 다시 확인해주세요.";
     }
 
+    // 404 : 모델을 찾을 수 없음
+    if (status === 404) {
+      return "요청한 AI 모델을 찾을 수 없습니다. 관리자에게 문의해주세요.";
+    }
+
     // 429 : 요청이 너무 많음 (속도 제한)
     if (status === 429) {
       return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.";
@@ -132,25 +137,11 @@
       }
 
       try {
-        // 아주 간단한 테스트 메시지를 보내봅니다
-        var testBody = {
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: "Hi" }],
-            },
-          ],
-          generationConfig: {
-            maxOutputTokens: 10, // 토큰을 최소로 사용하여 비용 절약
-          },
-        };
-
-        // API에 POST 요청을 보냅니다
-        var response = await fetch(ENDPOINT + "?key=" + key, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(testBody),
-        });
+        // 모델 목록 조회 API로 키 유효성을 확인합니다.
+        // 이 방식은 특정 모델에 의존하지 않아 더 안정적입니다.
+        var response = await fetch(
+          BASE_URL + "/models?key=" + key
+        );
 
         // HTTP 200이면 키가 유효한 것입니다
         return response.ok;
